@@ -2,20 +2,21 @@ import type { Knex } from "knex";
 
 
 export async function up(knex: Knex): Promise<void> {
-    return knex.schema.createTable('users', (table: Knex.CreateTableBuilder) => {
-        table.increments('id').primary();
-        table.string('public_id', 36).notNullable().unique();
-        table.string('name').notNullable();
-        table.string('cellphone_number').notNullable().unique();
-        table.string('email').notNullable().unique();
-        table.string('password').notNullable();
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.timestamp('updated_at').defaultTo(knex.fn.now());
+    return knex.schema.createTable("users", (table) => {
+        table.increments("id").primary();
+        table.uuid("public_id").notNullable().unique();
+        table.string("name", 255).notNullable();
+        table.string("email", 255).notNullable().unique();
+        table.string("phone_number", 13).notNullable().unique();
+        table.string("password", 255).notNullable();
+        table.datetime("created_at").defaultTo(knex.fn.now());
+        table.datetime("updated_at").nullable();
+
     });
 }
 
-
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.dropTable('users');
-}
+    
+    return knex.schema.dropTableIfExists("users");
 
+}
