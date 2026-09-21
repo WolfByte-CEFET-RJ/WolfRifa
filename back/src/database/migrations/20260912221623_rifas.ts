@@ -1,13 +1,10 @@
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable("raffles", (table) => {
-    table.increments("id").primary();
+    table.integer("campaign_id").primary().unsigned().notNullable().references("id").inTable("campaigns").onDelete("CASCADE");
     table.string("location", 255).notNullable();
     table.string("prize", 255).notNullable(); 
-
-
-    table.integer("campaign_id").unsigned().notNullable().references("id").inTable("campaigns").onDelete("CASCADE");
 
   });
 }
