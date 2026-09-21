@@ -1,6 +1,16 @@
-import { NextFunction, Request, Response } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { getJwtSecret } from '../config/auth';
+import type { NextFunction, Request, Response } from 'express';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import "dotenv/config";
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: {
+                id: number;
+            };
+        }
+    }
+}
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const authorization = req.headers.authorization;
@@ -15,10 +25,10 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
         return res.status(401).json({ message: 'Token mal formatado' });
     }
 
-    const secret = getJwtSecret(); 
+    const secret = process.env.JWT_SECRET; 
 
     try {
-        const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as JwtPayload;
+        const payload = jwt.verify(token, String(secret), { algorithms: ['HS256'] }) as JwtPayload;
 
         req.user = { id: Number(payload.sub) };
 

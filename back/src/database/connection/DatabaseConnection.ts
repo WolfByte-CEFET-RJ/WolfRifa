@@ -1,8 +1,9 @@
 import knex, { Knex } from 'knex';
-import DatabaseConfig from '../config/DatabaseConfig';
+import DatabaseConfig from '../config/DatabaseConfig.js';
 
 /**
  * Classe responsável pela configuração e gerenciamento da conexão com o banco de dados.
+ * Funciona no modelo singlwtown para ter apenas uma instancia ativa
  */
 class DatabaseConnection {
     private static instance: Knex | null = null;

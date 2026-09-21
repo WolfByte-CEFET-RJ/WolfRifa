@@ -1,4 +1,4 @@
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable("campaigns", (table: Knex.CreateTableBuilder) => {
@@ -8,13 +8,13 @@ export async function up(knex: Knex): Promise<void> {
     table.string("title", 255).notNullable();
     table.text("description").nullable();
     table.string("pix_key", 255).notNullable();
-    table.string("visibility", 20).notNullable(); 
+    table.boolean("ispublic").defaultTo(true); 
     table.string("status", 20).notNullable();     
     table.string("category", 20).notNullable();   
     table.date("start_date").notNullable();
     table.date("end_date").notNullable();
-
-    table.integer("organizer_id").unsigned().notNullable().references("id").inTable("organizers").onDelete("CASCADE");
+    table.enum('type', ['crowdfundings', 'raffles']).notNullable();
+    table.integer("organizer_id").unsigned().notNullable().references("id").inTable("users").onDelete("CASCADE");
 
     table.timestamp("created_at").defaultTo(knex.fn.now());
   });

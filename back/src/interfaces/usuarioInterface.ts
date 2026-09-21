@@ -1,5 +1,5 @@
 export interface Usuario {
-    id: number;
+    public_id: number;
     nome: string;
     email: string;
     celular: string;
