@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #1B5EA0;
+  --color-brand-primary-dark: #144A80;
+  --color-brand-primary-light: #DCEAF7;
+  --color-brand-ink: #1B5EA0;
+  --color-brand-white: #FFFFFF;
+  --color-brand-accent-red: #E53935;
+  --color-brand-error: #E53935;
+  --color-brand-success: #16A34A;
+  --color-brand-cream: #F2EFE3;
+
+
+  --color-brand-title: #185894;
+  --color-brand-subtitle: #3170A6;
+  --color-brand-body: #50769D;
+
+  --font-display: 'Poppins', 'Baloo 2', sans-serif;
+  --font-body: 'Inter', 'Poppins', sans-serif;
+}
+
+.diamond-pattern {
+  background-image: radial-gradient(#1B5EA0 0.5px, transparent 0.5px), radial-gradient(#1B5EA0 0.5px, #1B5EA0 0.5px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
