@@ -1,7 +1,10 @@
 import React from 'react';
 import { Logo } from './Logo';
+interface HeaderProps {
+  activeTab?: 'home' | 'campanhas' | 'sobre';
+}
 
-export const Header: React.FC = () => {
+export const Header: React.FC<HeaderProps> = ({ activeTab = 'home' }) => {
   return (
     <header className="bg-brand-primary text-white w-full border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -10,19 +13,19 @@ export const Header: React.FC = () => {
         <nav className="flex items-center gap-8">
           <a
             href="#"
-            className="font-medium text-base text-white border-b-2 border-white pb-1 transition-all"
+            className={`font-medium text-base transition-all ${activeTab === 'home' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Início
           </a>
           <a
             href="#campanhas"
-            className="font-medium text-base text-white/80 hover:text-white transition-colors"
+            className={`font-medium text-base transition-all ${activeTab === 'campanhas' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Campanhas
           </a>
           <a
             href="#sobre"
-            className="font-medium text-base text-white/80 hover:text-white transition-colors"
+            className={`font-medium text-base transition-all ${activeTab === 'sobre' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Sobre
           </a>
