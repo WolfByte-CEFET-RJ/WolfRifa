@@ -69,6 +69,12 @@ export const CampaignCard: React.FC<{ campaign: CampaignProps }> = ({ campaign }
           )}
         </div>
 
+        <div className="mt-6">
+          <button className="w-[85%] mx-auto block py-2.5 bg-[#2067A1] text-white rounded-lg font-semibold text-sm hover:bg-[#1a5585] transition-colors shadow-sm cursor-pointer">
+            Ver campanha &rarr;
+          </button>
+        </div>
+
       </div>
     </div>
   );
