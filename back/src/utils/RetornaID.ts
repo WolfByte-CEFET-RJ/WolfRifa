@@ -12,4 +12,5 @@ export async function retornaID(tabela: string, publicID: string): Promise<numbe
         console.error(`Erro ao buscar ID na tabela '${tabela}' para public_id '${publicID}':`, error);
         throw error;
     }
+}
 
