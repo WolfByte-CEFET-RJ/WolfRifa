@@ -8,13 +8,13 @@ import type { Usuario } from '../interfaces/usuarioInterface.js';
 const DUMMY_HASH = bcrypt.hashSync('senha-invalida', 10);
 
 export class AuthService {
-    static async login({ email, celular, senha }: AuthInput) {
+    static async login({ email, phone_number, password }: AuthInput) {
         const db = DatabaseConnection.getInstance();
 
-        const filtro = email ? { email } : { celular: celular ?? '' };
-        const usuario = await db<Usuario>('usuarios').where(filtro).first();
+        const filtro = email ? { email } : { phone_number: phone_number ?? '' };
+        const usuario = await db<Usuario>('users').where(filtro).first();
 
-        const senhaCorreta = await bcrypt.compare(senha, usuario?.senha ?? DUMMY_HASH);
+        const senhaCorreta = await bcrypt.compare(password, usuario?.password ?? DUMMY_HASH);
 
         if (!usuario || !senhaCorreta) {
             return null;
@@ -24,12 +24,12 @@ export class AuthService {
 
 
         const token = jwt.sign({ sub: String(usuario.public_id) }, String(secret), {
-            expiresIn: (process.env.JWT_EXPIRES_IN ?? '1d') as NonNullable<SignOptions['expiresIn']>,
+            expiresIn: (process.env.JWT_EXPIRES_IN) as NonNullable<SignOptions['expiresIn']>,
         });
 
         return {
             token,
-            usuario: { public_id: usuario.public_id, nome: usuario.nome, email: usuario.email, celular: usuario.celular },
+            usuario: { public_id: usuario.public_id, nome: usuario.nome, email: usuario.email, phone_number: usuario.phone_number },
         };
     }
 }

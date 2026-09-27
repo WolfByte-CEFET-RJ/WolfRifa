@@ -1,11 +1,15 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import userRoutes from './routes/usersRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app: express.Express = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(authRoutes);
+app.use(userRoutes);
 
 async function startServer(): Promise<void> {
     

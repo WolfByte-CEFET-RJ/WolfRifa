@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable("campaigns", (table: Knex.CreateTableBuilder) => {
 
     table.increments("id").primary();
-    table.uuid("public_id").notNullable().unique();
+    table.uuid("public_id").notNullable().unique().defaultTo(knex.raw('gen_random_uuid()'));
     table.string("title", 255).notNullable();
     table.text("description").nullable();
     table.string("pix_key", 255).notNullable();
