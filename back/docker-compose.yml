@@ -22,7 +22,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     depends_on:
       postgres:
         condition: service_healthy
