@@ -29,7 +29,7 @@ export class AuthService {
 
         return {
             token,
-            usuario: { public_id: usuario.public_id, nome: usuario.nome, email: usuario.email, phone_number: usuario.phone_number },
+            usuario: { public_id: usuario.public_id, nome: usuario.name, email: usuario.email, phone_number: usuario.phone_number },
         };
     }
 }
