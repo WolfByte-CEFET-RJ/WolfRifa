@@ -1,6 +1,7 @@
 import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
+    await knex("raffles").del();
     await knex("raffles")
         .insert({
             campaign_id: 2,

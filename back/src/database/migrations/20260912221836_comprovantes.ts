@@ -3,6 +3,7 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable("receipts", (table: Knex.CreateTableBuilder) => {
         table.increments("id").primary();
+        table.integer('campaigns_id').notNullable().references('id').inTable('campaigns')
         table.string("sender", 255).notNullable();
         table.string("recipient", 255).notNullable();
         table.integer("institution").notNullable();
@@ -16,4 +17,6 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
     return knex.schema.dropTableIfExists("receipts");
 }
+
+
 

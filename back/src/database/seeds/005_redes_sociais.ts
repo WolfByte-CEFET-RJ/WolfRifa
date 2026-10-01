@@ -1,6 +1,7 @@
 import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
+    await knex("social_networks").del();
     await knex("social_networks").insert([
         {
             id: 1,

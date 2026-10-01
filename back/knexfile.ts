@@ -13,8 +13,8 @@ const config: Record<string, Knex.Config> = {
     development: {
         client: "pg",
         connection: {
-            host: String(process.env.DB_HOST ),
-            port: Number(process.env.DB_PORT),
+            host: requireEnv("DB_HOST"),
+            port: Number(requireEnv("DB_PORT")),
             user: requireEnv("DB_USER"),
             password: requireEnv("DB_PASSWORD"),
             database: requireEnv("DB_NAME"),
@@ -32,7 +32,7 @@ const config: Record<string, Knex.Config> = {
 
     production: {
         client: "pg",
-        connection: requireEnv("DATABASE_URL"),
+        connection: String(process.env.DATABASE_URL),
         migrations: {
             directory: "./src/database/migrations",
             extension: "ts",
