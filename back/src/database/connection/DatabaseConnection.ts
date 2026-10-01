@@ -1,4 +1,5 @@
-import knex, { Knex } from 'knex';
+import knex from 'knex';
+import type { Knex } from 'knex';
 import DatabaseConfig from '../config/DatabaseConfig.js';
 
 /**

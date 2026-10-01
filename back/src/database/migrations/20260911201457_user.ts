@@ -4,10 +4,10 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable("users", (table) => {
         table.increments("id").primary();
-        table.uuid("public_id").notNullable().unique();
-        table.string("name", 255).notNullable();
+        table.uuid("public_id").notNullable().unique().defaultTo(knex.raw('gen_random_uuid()'));
+        table.string("name", 255).nullable();
         table.string("email", 255).notNullable().unique();
-        table.string("phone_number", 13).notNullable().unique();
+        table.string("phone_number", 13).nullable().unique();
         table.string("password", 255).notNullable();
         table.datetime("created_at").defaultTo(knex.fn.now());
         table.datetime("updated_at").nullable();
