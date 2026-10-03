@@ -23,4 +23,27 @@ export class UserService {
 
     return usuario;
     }
+
+    static async updateProfile(id: number, data: any) {
+        const db = DatabaseConnection.getInstance();
+        
+        const updateData: any = { updated_at: new Date() };
+        if (data.nome) updateData.name = data.nome;
+        if (data.celular) updateData.phone_number = data.celular;
+
+        if (Object.keys(updateData).length === 1) { // Only updated_at
+            throw new AppError('Nenhum dado para atualizar', 400);
+        }
+
+        const [usuario] = await db<Usuario>('users')
+            .where({ id })
+            .update(updateData)
+            .returning(['id', 'name', 'email', 'phone_number']);
+
+        if (!usuario) {
+            throw new AppError('Usuário não encontrado', 404);
+        }
+
+        return usuario;
+    }
 }

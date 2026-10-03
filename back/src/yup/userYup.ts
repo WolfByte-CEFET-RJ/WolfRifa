@@ -29,5 +29,17 @@ export const registerSchema = yup.object({
     .matches(/[A-Z]/, 'A senha deve ter pelo menos uma letra maiúscula')
     .matches(/\d/, 'A senha deve ter pelo menos um número'),
 });
+export const updateProfileSchema = yup.object({
+    nome: yup
+    .string()
+    .trim()
+    .min(2, 'O nome deve ter pelo menos 2 caracteres')
+    .max(100, 'O nome deve ter no máximo 100 caracteres'),
 
-export type RegisterInput = yup.InferType<typeof registerSchema>;
+    celular: yup
+    .string()
+    .transform((valor) => (typeof valor === 'string' ? valor.replace(/\D/g, '') : valor))
+    .matches(/^\d{10,13}$/, 'Celular inválido'),
+});
+
+export type UpdateProfileInput = yup.InferType<typeof updateProfileSchema>;
