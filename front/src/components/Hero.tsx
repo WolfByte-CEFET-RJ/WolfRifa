@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Hero: React.FC = () => {
   return (
@@ -20,12 +21,12 @@ export const Hero: React.FC = () => {
           </h1>
 
           <div>
-            <a
-              href="#campanhas"
+            <Link
+              to="/campanhas"
               className="inline-block bg-white hover:bg-gray-100 text-brand-primary font-semibold text-base px-8 py-3.5 rounded-full transition-all shadow-md hover:shadow-lg cursor-pointer"
             >
               Explorar campanhas
-            </a>
+            </Link>
           </div>
         </div>
       </div>

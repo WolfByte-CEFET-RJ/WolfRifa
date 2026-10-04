@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 
 export interface CampaignProps {
@@ -14,9 +15,10 @@ export interface CampaignProps {
 
 export const CampaignCard: React.FC<{ campaign: CampaignProps }> = ({ campaign }) => {
   const isRifa = campaign.type === 'rifa';
+  const targetPath = isRifa ? '/rifa' : '/vaquinha';
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-brand-primary-light/40 transition-all duration-300 flex flex-col group cursor-pointer">
+    <Link to={targetPath} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-brand-primary-light/40 transition-all duration-300 flex flex-col group cursor-pointer block text-left">
       <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-brand-primary-light/30">
         <img
           src={campaign.imageUrl}
@@ -70,6 +72,6 @@ export const CampaignCard: React.FC<{ campaign: CampaignProps }> = ({ campaign }
         </div>
 
       </div>
-    </div>
+    </Link>
   );
 };

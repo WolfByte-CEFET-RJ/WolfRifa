@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Logo } from './Logo';
 
 interface HeaderProps {
@@ -19,24 +20,24 @@ export const Header: React.FC<HeaderProps> = ({ activeTab = 'home' }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
         <nav className="flex items-center gap-8">
-          <a
-            href="#"
+          <Link
+            to="/"
             className={`font-medium text-base transition-all ${activeTab === 'home' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Início
-          </a>
-          <a
-            href="#campanhas"
+          </Link>
+          <Link
+            to="/campanhas"
             className={`font-medium text-base transition-all ${activeTab === 'campanhas' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Campanhas
-          </a>
-          <a
-            href="#sobre"
+          </Link>
+          <Link
+            to="/#sobre"
             className={`font-medium text-base transition-all ${activeTab === 'sobre' ? 'text-white border-b-2 border-white pb-1' : 'text-white/80 hover:text-white'}`}
           >
             Sobre
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -48,9 +49,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab = 'home' }) => {
             Entrar
           </button>
 
-          <div className="pl-4 border-l border-white/20">
+          <Link to="/" className="pl-4 border-l border-white/20 block cursor-pointer">
             <Logo variant="light" />
-          </div>
+          </Link>
         </div>
       </div>
     </header>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CampaignCard } from './CampaignCard';
 import type { CampaignProps } from './CampaignCard';
 import { ArrowRight } from 'lucide-react';
@@ -47,13 +48,13 @@ export const FeaturedCampaigns: React.FC = () => {
             </h2>
           </div>
 
-          <a
-            href="#"
+          <Link
+            to="/campanhas"
             className="inline-flex items-center gap-1.5 text-brand-subtitle font-semibold hover:text-brand-title transition-colors group text-sm sm:text-base"
           >
             <span>Ver todos</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
         </div>
 
 
