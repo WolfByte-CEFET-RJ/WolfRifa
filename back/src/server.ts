@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import userRoutes from './routes/usersRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import vaquinhaRoutes from './routes/vaquinhaRoutes.js';
 
 const app: express.Express = express();
 
@@ -10,6 +11,11 @@ app.use(cors());
 app.use(express.json());
 app.use(authRoutes);
 app.use(userRoutes);
+app.use(vaquinhaRoutes);
+
+app.get('/', (_req, res) => {
+    res.status(200).json({ message: 'Hello World!' });
+});
 
 async function startServer(): Promise<void> {
     
