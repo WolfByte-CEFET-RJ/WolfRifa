@@ -1,6 +1,7 @@
 import type { Knex } from 'knex';
 import DatabaseConnection from '../database/connection/DatabaseConnection.js';
 import { AppError } from '../utils/appError.js';
+import type { UpdateRaffleInput } from '../yup/raffleYup.js';
 
 interface RaffleRecord {
     id: number;
