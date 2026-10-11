@@ -1,6 +1,9 @@
 import type { Request, Response } from 'express';
 import { AppError } from '../utils/appError.js';
 import { RaffleService } from '../services/raffleService.js';
+import { updateRaffleSchema } from '../yup/raffleYup.js';
+import { ValidationError } from 'yup';
+
 
 export class RaffleController {
     static async delete(req: Request, res: Response) {
