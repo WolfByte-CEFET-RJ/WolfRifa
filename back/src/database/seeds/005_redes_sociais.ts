@@ -22,6 +22,6 @@ export async function seed(knex: Knex): Promise<void> {
             url: "https://youtube.com/@carla.mendes",
         },
     ])
-    .onConflict("id")
-    .merge(["user_id", "platform", "url"]);
+        .onConflict("id")
+        .merge(["user_id", "platform", "url"]);
 }

@@ -1,32 +1,29 @@
-# React + TypeScript + Vite
+# 🐺 WolfRifa - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Interface web da plataforma **WolfRifa**, desenvolvida com **React 19**, **TypeScript** e **Vite**.
 
-Currently, two official plugins are available:
+Para o guia completo do projeto, setup do backend, banco de dados e docker, consulte o [README principal do projeto](../README.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 Como Iniciar
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Certifique-se de que o backend já está rodando (ver [Setup do Backend](../README.md#-configuração-do-backend)).
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+3. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+4. Acesse: `http://localhost:5173`
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 📜 Scripts Disponíveis
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- `npm run dev`: Inicia o servidor Vite para desenvolvimento.
+- `npm run build`: Compila o projeto com verificação de tipos (`tsc -b`) para a pasta `dist/`.
+- `npm run preview`: Roda localmente o build gerado em `dist/`.
+- `npm run lint`: Executa a verificação do ESLint.
