@@ -8,6 +8,9 @@ interface VaquinhaRecord {
 }
 
 export class VaquinhaService {
+
+    
+
     static async delete(id: number, userId: number): Promise<void> {
         const db = DatabaseConnection.getInstance();
 
