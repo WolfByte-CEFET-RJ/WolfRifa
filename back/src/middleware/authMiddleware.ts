@@ -1,19 +1,18 @@
 import type { NextFunction, Request, Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import "dotenv/config";
-import { retornaID } from '../utils/RetornaID.js';
 
 declare global {
     namespace Express {
         interface Request {
             user?: {
-                id: number;
+                public_id: number;
             };
         }
     }
 }
 
-export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const authorization = req.headers.authorization;
 
     if (!authorization) {
@@ -26,20 +25,12 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         return res.status(401).json({ message: 'Token mal formatado' });
     }
 
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET; 
 
     try {
         const payload = jwt.verify(token, String(secret), { algorithms: ['HS256'] }) as JwtPayload;
 
-        let userId = Number(payload.id ?? payload.sub);
-
-        // Se o sub for um UUID (string), busca o id numérico correspondente no banco via retornaID
-        if (isNaN(userId)) {
-            const idEncontrado = await retornaID('users', String(payload.sub));
-            userId = idEncontrado ? Number(idEncontrado) : NaN;
-        }
-
-        req.user = { id: userId };
+        req.user = { public_id: Number(payload.sub) };
 
         return next();
     } catch (err) {
