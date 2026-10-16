@@ -1,7 +1,16 @@
 import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
+    // 1. Limpa as tabelas com chaves estrangeiras primeiro
+    await knex("receipts").del();
+    await knex("raffles").del();
+    await knex("crowdfundings").del();
+    await knex("campaigns").del();
     await knex("users").del();
+
+    const passwordHash = "$2b$10$H9moC5L3O1LSav1BG7EIgOQDKONZGU0IEI3grFxn4/8cDdRMoPAg6";
+
+    // 2. Insere os usuários com o hash gerado pelo seu ambiente
     await knex("users")
         .insert([
             {
@@ -10,7 +19,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Ana Souza",
                 email: "ana.souza@example.com",
                 phone_number: "5511999990001",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
             {
                 id: 2,
@@ -18,7 +27,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Bruno Lima",
                 email: "bruno.lima@example.com",
                 phone_number: "5511999990002",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
             {
                 id: 3,
@@ -26,7 +35,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Carla Mendes",
                 email: "carla.mendes@example.com",
                 phone_number: "5511999990003",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
         ])
         .onConflict("id")

@@ -7,7 +7,11 @@ import { vaquinhaSchema } from '../yup/vaquinhayup.js';
 export class VaquinhaController {
     static async create(req: Request, res: Response) {
         try {
-            const organizerId = req.user?.id ?? (
+            const user = req.user;
+            const authenticatedUserId = user && 'id' in user && typeof user.id === 'number'
+                ? user.id
+                : undefined;
+            const organizerId = authenticatedUserId ?? (
                 req.body.organizer_id
                     ? Number(req.body.organizer_id)
                     : undefined
@@ -69,21 +73,17 @@ export class VaquinhaController {
 
     static async delete(req: Request, res: Response) {
         try {
-            const idParam = req.params.id;
-            const id = Number(idParam);
-
-            if (
-                typeof idParam !== 'string' ||
-                !/^\d+$/.test(idParam) ||
-                !Number.isSafeInteger(id) ||
-                id <= 0
-            ) {
+            const publicId = req.params.public_id;
+            if (typeof publicId !== 'string' || publicId.length === 0) {
                 return res.status(400).json({
-                    message: 'ID da vaquinha inválido',
+                    message: 'public_id da vaquinha inválido',
                 });
             }
 
-            const userId = req.user?.id;
+            const user = req.user;
+            const userId = user && 'id' in user && typeof user.id === 'number'
+                ? user.id
+                : undefined;
 
             if (userId === undefined) {
                 return res.status(401).json({
@@ -91,7 +91,7 @@ export class VaquinhaController {
                 });
             }
 
-            await VaquinhaService.delete(id, userId);
+            await VaquinhaService.delete(publicId, userId);
 
             return res.status(200).json({
                 success: true,

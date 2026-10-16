@@ -5,7 +5,7 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const campaignRoutes = Router();
 
-campaignRoutes.patch('/campaign/rifa/:id', authMiddleware, RaffleController.update);
-campaignRoutes.delete('/campaign/vaquinha/:id', authMiddleware, VaquinhaController.delete);
+campaignRoutes.patch('/campaign/rifa/:public_id', authMiddleware, RaffleController.update);
+campaignRoutes.delete('/campaign/vaquinha/:public_id', authMiddleware, VaquinhaController.delete);
 
 export default campaignRoutes;

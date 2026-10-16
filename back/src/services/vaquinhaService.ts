@@ -1,7 +1,12 @@
 import type { Knex } from 'knex';
 import DatabaseConnection from '../database/connection/DatabaseConnection.js';
+import type {
+    PublicIdParams,
+    VaquinhaRifaServiceResponse,
+} from '../interfaces/vaquinhaRifaInterface.js';
 import type { CreateVaquinhaDTO, VaquinhaResponse } from '../interfaces/vaquinhaInterface.js';
 import { AppError } from '../utils/appError.js';
+import { retornaID } from '../utils/RetornaID.js';
 
 interface VaquinhaRecord {
     id: number;
@@ -117,7 +122,12 @@ export class VaquinhaService {
         }));
     }
 
-    static async delete(id: number, userId: number): Promise<void> {
+    static async delete(publicId: PublicIdParams['public_id'], userId: number): Promise<void> {
+        const id = await retornaID('campaigns', publicId);
+        if (id === null) {
+            throw new AppError('Vaquinha não encontrada', 404);
+        }
+
         const db = DatabaseConnection.getInstance();
 
         await db.transaction(async (trx: Knex.Transaction) => {
