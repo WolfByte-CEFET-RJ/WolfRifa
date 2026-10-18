@@ -1,31 +1,30 @@
 import type { Knex } from 'knex';
 import DatabaseConnection from '../database/connection/DatabaseConnection.js';
 import { AppError } from '../utils/appError.js';
-import type { UpdateRaffleInput } from '../yup/raffleYup.js';
+import { retornaID } from '../utils/RetornaID.js';
+import type {
+    PublicIdParams,
+    UpdateVaquinhaRifaDTO,
+    VaquinhaRifaServiceResponse,
+} from '../interfaces/vaquinhaRifaInterface.js';
 
 interface RaffleRecord {
     id: number;
     organizer_id: number;
 }
-
-interface RaffleRecord {
-    id: number;
-    organizer_id: number;
-    status: string;
-    name: string;
-    award: string;
-}
-
-interface UpdatedRaffle {
-    id: number;
-    name: string;
-    award: string;
-    status: string;
-}
-
 
 export class RaffleService {
-    static async delete(id: number, userId: number): Promise<void> {
+    static async delete(publicId: PublicIdParams['public_id'], userPublicId: string): Promise<void> {
+        const id = await retornaID('campaigns', publicId);
+        if (id === null) {
+            throw new AppError('Rifa não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
+        }
+
         const db = DatabaseConnection.getInstance();
 
         await db.transaction(async (trx: Knex.Transaction) => {
@@ -44,7 +43,7 @@ export class RaffleService {
                 throw new AppError('Rifa não encontrada', 404);
             }
 
-            if (rifa.organizer_id !== userId) {
+            if (rifa.organizer_id !== Number(userId)) {
                 throw new AppError('Não autorizado', 403);
             }
 
@@ -59,7 +58,28 @@ export class RaffleService {
         });
     }
   
-  static async update(id: number, userId: number, changes: UpdateRaffleInput): Promise<UpdatedRaffle> {
+    static async update(
+        publicId: PublicIdParams['public_id'],
+        userPublicId: string,
+        changes: UpdateVaquinhaRifaDTO
+    ): Promise<VaquinhaRifaServiceResponse> {
+        if (changes.amount_collected !== undefined || changes.social_networks !== undefined) {
+            throw new AppError(
+                'Meta de arrecadação e redes sociais não são campos de atualização de rifa',
+                400
+            );
+        }
+
+        const id = await retornaID('campaigns', publicId);
+        if (id === null) {
+            throw new AppError('Rifa não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
+        }
+
         const db = DatabaseConnection.getInstance();
 
         return db.transaction(async (trx: Knex.Transaction) => {
@@ -80,24 +100,30 @@ export class RaffleService {
                 throw new AppError('Rifa não encontrada', 404);
             }
 
-            if (rifa.organizer_id !== userId) {
+            if (rifa.organizer_id !== Number(userId)) {
                 throw new AppError('Não autorizado', 403);
             }
 
             const updatedAt = new Date();
-            const campaignChanges: Record<string, string | Date> = { updated_at: updatedAt };
+            const campaignChanges: Record<string, string | boolean | Date | null> = { updated_at: updatedAt };
             const raffleChanges: Record<string, string | Date> = { updated_at: updatedAt };
 
             if (changes.name !== undefined) campaignChanges.title = changes.name;
             if (changes.description !== undefined) campaignChanges.description = changes.description;
+            if (changes.visibility !== undefined) campaignChanges.ispublic = changes.visibility !== 'privada';
+            if (changes.pix_key !== undefined) campaignChanges.pix_key = changes.pix_key;
+            if (changes.start_date !== undefined) campaignChanges.start_date = changes.start_date;
             if (changes.end_date !== undefined) campaignChanges.end_date = changes.end_date;
+            if (changes.category !== undefined) campaignChanges.category = changes.category;
             if (changes.award !== undefined) raffleChanges.prize = changes.award;
             if (changes.local !== undefined) raffleChanges.location = changes.local;
 
             await trx('campaigns').where({ id }).update(campaignChanges);
-            await trx('raffles').where({ campaign_id: id }).update(raffleChanges);
+            if (changes.award !== undefined || changes.local !== undefined) {
+                await trx('raffles').where({ campaign_id: id }).update(raffleChanges);
+            }
 
-            const updatedRaffle = await trx<UpdatedRaffle>('campaigns')
+            const updatedRaffle = await trx<VaquinhaRifaServiceResponse>('campaigns')
                 .join('raffles', 'raffles.campaign_id', 'campaigns.id')
                 .where('campaigns.id', id)
                 .select({
@@ -111,9 +137,7 @@ export class RaffleService {
             if (!updatedRaffle) {
                 throw new AppError('Rifa não encontrada', 404);
             }
-
             return updatedRaffle;
         });
     }
-  
 }

@@ -1,7 +1,19 @@
 import type { Knex } from "knex";
+import 'dotenv/config';
+import bcrypt from "bcrypt";
 
 export async function seed(knex: Knex): Promise<void> {
+    // 1. Limpa as tabelas com chaves estrangeiras primeiro
+    await knex("receipts").del();
+    await knex("raffles").del();
+    await knex("crowdfundings").del();
+    await knex("campaigns").del();
     await knex("users").del();
+
+    const SEED_TESTE_PASSWORD = process.env.SEED_TESTE_PASSWORD || "Senha@123"; //senha das seeds testes
+    const passwordHash = await bcrypt.hash(SEED_TESTE_PASSWORD, 10);
+
+    // 2. Insere os usuários com o hash gerado pelo seu ambiente
     await knex("users")
         .insert([
             {
@@ -10,7 +22,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Ana Souza",
                 email: "ana.souza@example.com",
                 phone_number: "5511999990001",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
             {
                 id: 2,
@@ -18,7 +30,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Bruno Lima",
                 email: "bruno.lima@example.com",
                 phone_number: "5511999990002",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
             {
                 id: 3,
@@ -26,7 +38,7 @@ export async function seed(knex: Knex): Promise<void> {
                 name: "Carla Mendes",
                 email: "carla.mendes@example.com",
                 phone_number: "5511999990003",
-                password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy",
+                password: passwordHash,
             },
         ])
         .onConflict("id")
