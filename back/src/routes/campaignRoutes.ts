@@ -8,6 +8,8 @@ const campaignRoutes = Router();
 campaignRoutes.patch('/campaign/rifa/:public_id', authMiddleware, RaffleController.update);
 
 //vaquinha
+campaignRoutes.post('/campaign/vaquinha', authMiddleware, VaquinhaController.create);
+campaignRoutes.get('/campaign/vaquinha', VaquinhaController.list);
 campaignRoutes.delete('/campaign/vaquinha/:public_id', authMiddleware, VaquinhaController.delete);
 
 export default campaignRoutes;
