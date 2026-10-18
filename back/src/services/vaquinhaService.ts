@@ -2,7 +2,6 @@ import type { Knex } from 'knex';
 import DatabaseConnection from '../database/connection/DatabaseConnection.js';
 import type {
     PublicIdParams,
-    VaquinhaRifaServiceResponse,
 } from '../interfaces/vaquinhaRifaInterface.js';
 import type { CreateVaquinhaDTO, VaquinhaResponse } from '../interfaces/vaquinhaInterface.js';
 import { AppError } from '../utils/appError.js';
@@ -14,7 +13,15 @@ interface VaquinhaRecord {
 }
 
 export class VaquinhaService {
-    static async create(dados: CreateVaquinhaDTO): Promise<VaquinhaResponse> {
+    static async create(
+        dados: Omit<CreateVaquinhaDTO, 'organizer_id'>,
+        userPublicId: string
+    ): Promise<VaquinhaResponse> {
+        const organizerId = Number(await retornaID('users', userPublicId));
+        if (!Number.isInteger(organizerId) || organizerId <= 0) {
+            throw new AppError('Usuário não encontrado', 401);
+        }
+
         const db = DatabaseConnection.getInstance();
 
         return await db.transaction(async (trx) => {
@@ -31,7 +38,7 @@ export class VaquinhaService {
                     start_date: dados.start_date,
                     end_date: dados.end_date,
                     type: 'crowdfundings',
-                    organizer_id: dados.organizer_id,
+                    organizer_id: organizerId,
                 })
                 .returning([
                     'id',
@@ -63,7 +70,7 @@ export class VaquinhaService {
             if (dados.social_networks && dados.social_networks.length > 0) {
                 await trx('social_networks').insert(
                     dados.social_networks.map((sn) => ({
-                        user_id: dados.organizer_id,
+                        user_id: organizerId,
                         platform: sn.platform,
                         url: sn.url,
                     }))
@@ -93,7 +100,6 @@ export class VaquinhaService {
             .join('crowdfundings', 'campaigns.id', 'crowdfundings.campaign_id')
             .where('campaigns.type', 'crowdfundings')
             .select(
-                'campaigns.id',
                 'campaigns.public_id',
                 'campaigns.title',
                 'campaigns.description',
@@ -104,13 +110,11 @@ export class VaquinhaService {
                 'campaigns.start_date',
                 'campaigns.end_date',
                 'campaigns.type',
-                'campaigns.organizer_id',
                 'campaigns.created_at',
                 'crowdfundings.raised_amount'
             );
 
         return vaquinhas.map((v) => ({
-            id: Number(v.id),
             public_id: String(v.public_id),
             name: String(v.title),
             visibility: v.ispublic ? 'publica' : 'privada',
@@ -122,10 +126,15 @@ export class VaquinhaService {
         }));
     }
 
-    static async delete(publicId: PublicIdParams['public_id'], userId: number): Promise<void> {
+    static async delete(publicId: PublicIdParams['public_id'], userPublicId: string): Promise<void> {
         const id = await retornaID('campaigns', publicId);
         if (id === null) {
             throw new AppError('Vaquinha não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
         }
 
         const db = DatabaseConnection.getInstance();
@@ -146,7 +155,7 @@ export class VaquinhaService {
                 throw new AppError('Vaquinha não encontrada', 404);
             }
 
-            if (vaquinha.organizer_id !== userId) {
+            if (vaquinha.organizer_id !== Number(userId)) {
                 throw new AppError('Não autorizado', 403);
             }
 

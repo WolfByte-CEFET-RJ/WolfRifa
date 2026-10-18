@@ -7,18 +7,9 @@ import { vaquinhaSchema } from '../yup/vaquinhayup.js';
 export class VaquinhaController {
     static async create(req: Request, res: Response) {
         try {
-            const user = req.user;
-            const authenticatedUserId = user && 'id' in user && typeof user.id === 'number'
-                ? user.id
-                : undefined;
-            const organizerId = authenticatedUserId ?? (
-                req.body.organizer_id
-                    ? Number(req.body.organizer_id)
-                    : undefined
-            );
-
-            if (!organizerId || isNaN(organizerId)) {
-                return res.status(403).json({ message: 'Não autorizado' });
+            const userPublicId = req.user?.public_id;
+            if (userPublicId === undefined) {
+                return res.status(401).json({ message: 'Token não informado' });
             }
 
             const dados = await vaquinhaSchema.validate(req.body, {
@@ -26,10 +17,7 @@ export class VaquinhaController {
                 stripUnknown: true,
             });
 
-            const resposta = await VaquinhaService.create({
-                ...dados,
-                organizer_id: organizerId,
-            });
+            const resposta = await VaquinhaService.create(dados, String(userPublicId));
 
             return res.status(200).json(resposta);
         } catch (err) {
@@ -74,24 +62,23 @@ export class VaquinhaController {
     static async delete(req: Request, res: Response) {
         try {
             const publicId = req.params.public_id;
+            console.log(publicId)
+            
             if (typeof publicId !== 'string' || publicId.length === 0) {
                 return res.status(400).json({
                     message: 'public_id da vaquinha inválido',
                 });
             }
 
-            const user = req.user;
-            const userId = user && 'id' in user && typeof user.id === 'number'
-                ? user.id
-                : undefined;
-
-            if (userId === undefined) {
+            const userPublicId = req.user?.public_id;
+            console.log(userPublicId)
+            if (userPublicId === undefined) {
                 return res.status(401).json({
                     message: 'Token não informado',
                 });
             }
 
-            await VaquinhaService.delete(publicId, userId);
+            await VaquinhaService.delete(publicId, String(userPublicId));
 
             return res.status(200).json({
                 success: true,

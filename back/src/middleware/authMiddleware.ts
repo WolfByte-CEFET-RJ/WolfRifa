@@ -6,7 +6,7 @@ declare global {
     namespace Express {
         interface Request {
             user?: {
-                public_id: number;
+                public_id: string;
             };
         }
     }
@@ -30,7 +30,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     try {
         const payload = jwt.verify(token, String(secret), { algorithms: ['HS256'] }) as JwtPayload;
 
-        req.user = { public_id: Number(payload.sub) };
+        req.user = { public_id: String(payload.sub) };
 
         return next();
     } catch (err) {

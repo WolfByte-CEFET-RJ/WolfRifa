@@ -1,4 +1,6 @@
 import type { Knex } from "knex";
+import 'dotenv/config';
+import bcrypt from "bcrypt";
 
 export async function seed(knex: Knex): Promise<void> {
     // 1. Limpa as tabelas com chaves estrangeiras primeiro
@@ -8,7 +10,8 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("campaigns").del();
     await knex("users").del();
 
-    const passwordHash = "$2b$10$H9moC5L3O1LSav1BG7EIgOQDKONZGU0IEI3grFxn4/8cDdRMoPAg6";
+    const SEED_TESTE_PASSWORD = process.env.SEED_TESTE_PASSWORD || "Senha@123"; //senha das seeds testes
+    const passwordHash = await bcrypt.hash(SEED_TESTE_PASSWORD, 10);
 
     // 2. Insere os usuários com o hash gerado pelo seu ambiente
     await knex("users")

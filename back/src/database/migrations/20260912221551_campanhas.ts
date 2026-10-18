@@ -15,8 +15,9 @@ export async function up(knex: Knex): Promise<void> {
     table.date("end_date").notNullable();
     table.enum('type', ['crowdfundings', 'raffles']).notNullable();
     table.integer("organizer_id").unsigned().notNullable().references("id").inTable("users").onDelete("CASCADE");
-
     table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.timestamp('updated_at').nullable();
+
   });
 
 }

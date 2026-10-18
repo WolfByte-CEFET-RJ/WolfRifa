@@ -14,10 +14,15 @@ interface RaffleRecord {
 }
 
 export class RaffleService {
-    static async delete(publicId: PublicIdParams['public_id'], userId: number): Promise<void> {
+    static async delete(publicId: PublicIdParams['public_id'], userPublicId: string): Promise<void> {
         const id = await retornaID('campaigns', publicId);
         if (id === null) {
             throw new AppError('Rifa não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
         }
 
         const db = DatabaseConnection.getInstance();
@@ -38,7 +43,7 @@ export class RaffleService {
                 throw new AppError('Rifa não encontrada', 404);
             }
 
-            if (rifa.organizer_id !== userId) {
+            if (rifa.organizer_id !== Number(userId)) {
                 throw new AppError('Não autorizado', 403);
             }
 
@@ -55,7 +60,7 @@ export class RaffleService {
   
     static async update(
         publicId: PublicIdParams['public_id'],
-        userId: number,
+        userPublicId: string,
         changes: UpdateVaquinhaRifaDTO
     ): Promise<VaquinhaRifaServiceResponse> {
         if (changes.amount_collected !== undefined || changes.social_networks !== undefined) {
@@ -68,6 +73,11 @@ export class RaffleService {
         const id = await retornaID('campaigns', publicId);
         if (id === null) {
             throw new AppError('Rifa não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
         }
 
         const db = DatabaseConnection.getInstance();
@@ -90,7 +100,7 @@ export class RaffleService {
                 throw new AppError('Rifa não encontrada', 404);
             }
 
-            if (rifa.organizer_id !== userId) {
+            if (rifa.organizer_id !== Number(userId)) {
                 throw new AppError('Não autorizado', 403);
             }
 

@@ -14,15 +14,12 @@ export class RaffleController {
                 return res.status(400).json({ message: 'public_id da rifa inválido' });
             }
 
-            const user = req.user;
-            const userId = user && 'id' in user && typeof user.id === 'number'
-                ? user.id
-                : undefined;
-            if (userId === undefined) {
+            const userPublicId = req.user?.public_id;
+            if (userPublicId === undefined) {
                 return res.status(401).json({ message: 'Token não informado' });
             }
 
-            await RaffleService.delete(publicId, userId);
+            await RaffleService.delete(publicId, userPublicId);
             return res.status(200).json({ success: true, message: 'Rifa removida com sucesso.' });
         } catch (err) {
             if (err instanceof AppError) {
@@ -44,11 +41,8 @@ export class RaffleController {
                 return res.status(400).json({ message: 'public_id da rifa inválido' });
             }
 
-            const user = req.user;
-            const userId = user && 'id' in user && typeof user.id === 'number'
-                ? user.id
-                : undefined;
-            if (userId === undefined) {
+            const userPublicId = req.user?.public_id;
+            if (userPublicId === undefined) {
                 return res.status(401).json({ message: 'Token não informado' });
             }
 
@@ -57,7 +51,7 @@ export class RaffleController {
                 stripUnknown: true,
             });
 
-            const rifa = await RaffleService.update(publicId, userId, dados);
+            const rifa = await RaffleService.update(publicId, userPublicId, dados);
             return res.status(200).json({ rifa });
         } catch (err) {
             if (err instanceof ValidationError) {

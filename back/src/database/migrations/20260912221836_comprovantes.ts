@@ -8,7 +8,8 @@ export async function up(knex: Knex): Promise<void> {
         table.string("recipient", 255).notNullable();
         table.integer("institution").notNullable();
         table.decimal("amount", 10, 2).notNullable();
-        table.date("created_at").notNullable();
+        table.timestamp("created_at").notNullable();
+        table.timestamp('updated_at').nullable();
         table.integer("quota_count").notNullable();
         table.enum("status", ["pending", "approved", "rejected"]).notNullable();
     });
