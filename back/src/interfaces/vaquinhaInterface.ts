@@ -66,9 +66,36 @@ export interface VaquinhaResponse {
 }
 
 /**
+ * Estrutura de resposta pública de detalhes da vaquinha (GET /campaign/vaquinhas/:public_id).
+ * Sem exposição de campos sensíveis internos (id, organizer_id, senhas ou dados privados).
+ */
+export interface VaquinhaDetalhesResponse {
+    public_id: string;
+    name: string;
+    title: string;
+    description: string | null;
+    pix_key: string;
+    visibility: 'publica' | 'privada';
+    status: string;
+    category: string;
+    start_date: string | Date;
+    end_date: string | Date;
+    created_at?: string | Date | undefined;
+    amount_collected: number;
+    vaquinha: {
+        amount_collected: number;
+    };
+    organizer: {
+        name: string | null;
+    };
+    social_networks: SocialNetworkInput[];
+}
+
+/**
  * Representa a entidade completa de Vaquinha com dados herdados de Campanha.
  */
 export interface Vaquinha extends Campanha {
     type: 'crowdfundings';
     raised_amount?: number | undefined;
 }
+

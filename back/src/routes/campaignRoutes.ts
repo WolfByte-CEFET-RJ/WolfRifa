@@ -10,6 +10,8 @@ campaignRoutes.patch('/campaign/rifa/:public_id', authMiddleware, RaffleControll
 //vaquinha
 campaignRoutes.post('/campaign/vaquinha', authMiddleware, VaquinhaController.create);
 campaignRoutes.get('/campaign/vaquinha', VaquinhaController.list);
+campaignRoutes.get('/campaign/vaquinhas/:public_id', VaquinhaController.getByPublicId);
+campaignRoutes.get('/campaign/vaquinha/:public_id', VaquinhaController.getByPublicId);
 campaignRoutes.delete('/campaign/vaquinha/:public_id', authMiddleware, VaquinhaController.delete);
 
 export default campaignRoutes;

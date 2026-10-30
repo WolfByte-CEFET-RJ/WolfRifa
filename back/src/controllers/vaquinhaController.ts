@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { ValidationError } from 'yup';
 import { AppError } from '../utils/appError.js';
 import { VaquinhaService } from '../services/vaquinhaService.js';
-import { vaquinhaSchema } from '../yup/vaquinhayup.js';
+import { vaquinhaSchema, publicIdParamSchema } from '../yup/vaquinhayup.js';
 
 export class VaquinhaController {
     static async create(req: Request, res: Response) {
@@ -57,6 +57,44 @@ export class VaquinhaController {
                 message: 'Erro interno desconhecido do servidor',
             });
         }
+    }
+
+    static async getByPublicId(req: Request, res: Response) {
+        try {
+            const rawPublicId = req.params.public_id ?? req.params.pid;
+            const { public_id } = await publicIdParamSchema.validate(
+                { public_id: rawPublicId },
+                {
+                    abortEarly: false,
+                    stripUnknown: true,
+                }
+            );
+
+            const vaquinha = await VaquinhaService.getByPublicId(public_id);
+            return res.status(200).json({ vaquinha });
+        } catch (err) {
+            if (err instanceof ValidationError) {
+                return res.status(400).json({
+                    message: 'Formato do public_id inválido',
+                    errors: err.errors,
+                });
+            }
+
+            if (err instanceof AppError) {
+                return res.status(err.statusCode).json({
+                    message: err.message,
+                });
+            }
+
+            console.error(err);
+            return res.status(500).json({
+                message: 'Erro interno desconhecido do servidor',
+            });
+        }
+    }
+
+    static async getById(req: Request, res: Response) {
+        return VaquinhaController.getByPublicId(req, res);
     }
 
     static async delete(req: Request, res: Response) {

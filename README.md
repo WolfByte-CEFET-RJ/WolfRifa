@@ -332,6 +332,21 @@ Principais rotas disponíveis na versão atual:
 | `POST` | `/api/auth/user/register` | Não | Cadastra um novo usuário na plataforma |
 | `POST` | `/campaign/vaquinha` | **Sim (JWT)** | Cria uma nova vaquinha (campanha + crowdfunding) conforme documentação oficial |
 | `GET` | `/campaign/vaquinha` | Não | Lista todas as vaquinhas ativas cadastradas |
+| `GET` | `/campaign/vaquinhas/:public_id` | Não | Retorna os detalhes públicos de uma vaquinha por `public_id` (sem dados sensíveis) |
+
+### 📖 Especificação: `GET /campaign/vaquinhas/:public_id`
+
+- **Acesso:** Público (não exige autenticação).
+- **Parâmetro de URL:**
+  - `:public_id` (UUID): Identificador público da campanha.
+- **Códigos de Resposta:**
+  - `200 OK`: Retorna objeto `{ vaquinha: { ... } }` com dados da campanha, meta/arrecadação, nome do organizador e redes sociais.
+  - `400 Bad Request`: Formato do `public_id` inválido (quando não segue o padrão UUID).
+  - `404 Not Found`: Vaquinha não encontrada para o `public_id` informado.
+- **Segurança e Privacidade:**
+  - Não expõe chaves primárias internas (`id`, `organizer_id`).
+  - Não expõe credenciais de usuários (senhas/hash), e-mails pessoais ou telefones.
+  - Não expõe dados de comprovantes bancários ou transações de terceiros.
 
 ---
 

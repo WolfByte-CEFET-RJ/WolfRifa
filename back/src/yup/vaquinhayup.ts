@@ -65,3 +65,13 @@ export const vaquinhaSchema = yup.object({
 });
 
 export type VaquinhaInput = yup.InferType<typeof vaquinhaSchema>;
+
+export const publicIdParamSchema = yup.object({
+    public_id: yup
+        .string()
+        .trim()
+        .uuid('Formato do public_id inválido. Deve ser um UUID válido')
+        .required('O public_id é obrigatório'),
+});
+
+export type PublicIdParamInput = yup.InferType<typeof publicIdParamSchema>;

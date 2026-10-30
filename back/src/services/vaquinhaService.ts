@@ -3,7 +3,7 @@ import DatabaseConnection from '../database/connection/DatabaseConnection.js';
 import type {
     PublicIdParams,
 } from '../interfaces/vaquinhaRifaInterface.js';
-import type { CreateVaquinhaDTO, VaquinhaResponse } from '../interfaces/vaquinhaInterface.js';
+import type { CreateVaquinhaDTO, VaquinhaResponse, VaquinhaDetalhesResponse } from '../interfaces/vaquinhaInterface.js';
 import { AppError } from '../utils/appError.js';
 import { retornaID } from '../utils/RetornaID.js';
 
@@ -124,6 +124,70 @@ export class VaquinhaService {
                 amount_collected: Number(v.raised_amount),
             },
         }));
+    }
+
+    static async getByPublicId(publicId: string): Promise<VaquinhaDetalhesResponse> {
+        const id = await retornaID('campaigns', publicId);
+        if (id === null) {
+            throw new AppError('Vaquinha não encontrada', 404);
+        }
+
+        const db = DatabaseConnection.getInstance();
+
+        const campanha = await db('campaigns')
+            .join('crowdfundings', 'campaigns.id', 'crowdfundings.campaign_id')
+            .leftJoin('users', 'campaigns.organizer_id', 'users.id')
+            .where('campaigns.id', id)
+            .andWhere('campaigns.type', 'crowdfundings')
+            .select(
+                'campaigns.public_id',
+                'campaigns.title',
+                'campaigns.description',
+                'campaigns.pix_key',
+                'campaigns.ispublic',
+                'campaigns.status',
+                'campaigns.category',
+                'campaigns.start_date',
+                'campaigns.end_date',
+                'campaigns.created_at',
+                'campaigns.organizer_id',
+                'crowdfundings.raised_amount',
+                'users.name as organizer_name'
+            )
+            .first();
+
+        if (!campanha) {
+            throw new AppError('Vaquinha não encontrada', 404);
+        }
+
+        const socialNetworks = await db('social_networks')
+            .where('user_id', campanha.organizer_id)
+            .select('platform', 'url');
+
+        return {
+            public_id: String(campanha.public_id),
+            name: String(campanha.title),
+            title: String(campanha.title),
+            description: campanha.description ?? null,
+            pix_key: String(campanha.pix_key),
+            visibility: campanha.ispublic ? 'publica' : 'privada',
+            status: String(campanha.status),
+            category: String(campanha.category),
+            start_date: campanha.start_date,
+            end_date: campanha.end_date,
+            created_at: campanha.created_at,
+            amount_collected: Number(campanha.raised_amount ?? 0),
+            vaquinha: {
+                amount_collected: Number(campanha.raised_amount ?? 0),
+            },
+            organizer: {
+                name: campanha.organizer_name ?? null,
+            },
+            social_networks: (socialNetworks ?? []).map((sn: { platform: string; url: string }) => ({
+                platform: sn.platform as 'instagram' | 'facebook' | 'tiktok' | 'youtube' | 'x' | 'other',
+                url: sn.url,
+            })),
+        };
     }
 
     static async delete(publicId: PublicIdParams['public_id'], userPublicId: string): Promise<void> {
