@@ -2,6 +2,7 @@ import type { Knex } from 'knex';
 import DatabaseConnection from '../database/connection/DatabaseConnection.js';
 import type {
     PublicIdParams,
+    UpdateVaquinhaRifaDTO,
 } from '../interfaces/vaquinhaRifaInterface.js';
 import type { CreateVaquinhaDTO, VaquinhaResponse } from '../interfaces/vaquinhaInterface.js';
 import { AppError } from '../utils/appError.js';
@@ -10,6 +11,21 @@ import { retornaID } from '../utils/RetornaID.js';
 interface VaquinhaRecord {
     id: number;
     organizer_id: number;
+}
+
+interface VaquinhaUpdateRecord {
+    id: number;
+    organizer_id: number;
+    start_date: Date;
+}
+
+interface UpdatedVaquinha {
+    public_id: string;
+    name: string;
+    description: string | null;
+    end_date: Date;
+    raised_amount: string;
+    status: string;
 }
 
 export class VaquinhaService {
@@ -173,6 +189,94 @@ export class VaquinhaService {
 
             // crowdfundings e registrations são removidos via ON DELETE CASCADE.
             await trx('campaigns').where({ id }).del();
+        });
+    }
+
+    static async update(
+        publicId: PublicIdParams['public_id'],
+        userPublicId: string,
+        changes: UpdateVaquinhaRifaDTO
+    ): Promise<UpdatedVaquinha> {
+        if (
+            changes.award !== undefined ||
+            changes.local !== undefined ||
+            changes.amount_collected !== undefined ||
+            changes.social_networks !== undefined
+        ) {
+            throw new AppError(
+                'Prêmio, local, meta de arrecadação e redes sociais não são campos de atualização de vaquinha',
+                400
+            );
+        }
+
+        const id = await retornaID('campaigns', publicId);
+        if (id === null) {
+            throw new AppError('Vaquinha não encontrada', 404);
+        }
+
+        const userId = await retornaID('users', userPublicId);
+        if (userId === null) {
+            throw new AppError('Usuário não encontrado', 401);
+        }
+
+        const db = DatabaseConnection.getInstance();
+
+        return db.transaction(async (trx: Knex.Transaction) => {
+            const vaquinha = await trx<VaquinhaUpdateRecord>('campaigns')
+                .join('crowdfundings', 'crowdfundings.campaign_id', 'campaigns.id')
+                .where('campaigns.id', id)
+                .andWhere('campaigns.type', 'crowdfundings')
+                .select({
+                    id: 'campaigns.id',
+                    organizer_id: 'campaigns.organizer_id',
+                    start_date: 'campaigns.start_date',
+                })
+                .forUpdate()
+                .first();
+
+            if (!vaquinha) {
+                throw new AppError('Vaquinha não encontrada', 404);
+            }
+
+            if (vaquinha.organizer_id !== Number(userId)) {
+                throw new AppError('Não autorizado', 403);
+            }
+
+            const startDate = new Date(changes.start_date ?? vaquinha.start_date);
+            if (changes.end_date !== undefined && new Date(changes.end_date) < startDate) {
+                throw new AppError('A data de encerramento deve ser posterior à data de início', 400);
+            }
+
+            const campaignChanges: Record<string, string | boolean | Date | null> = { updated_at: new Date() };
+
+            if (changes.name !== undefined) campaignChanges.title = changes.name;
+            if (changes.description !== undefined) campaignChanges.description = changes.description;
+            if (changes.visibility !== undefined) campaignChanges.ispublic = changes.visibility !== 'privada';
+            if (changes.pix_key !== undefined) campaignChanges.pix_key = changes.pix_key;
+            if (changes.start_date !== undefined) campaignChanges.start_date = changes.start_date;
+            if (changes.end_date !== undefined) campaignChanges.end_date = changes.end_date;
+            if (changes.category !== undefined) campaignChanges.category = changes.category;
+
+            await trx('campaigns').where({ id }).update(campaignChanges);
+
+            const updatedVaquinha = await trx<UpdatedVaquinha>('campaigns')
+                .join('crowdfundings', 'crowdfundings.campaign_id', 'campaigns.id')
+                .where('campaigns.id', id)
+                .select({
+                    public_id: 'campaigns.public_id',
+                    name: 'campaigns.title',
+                    description: 'campaigns.description',
+                    end_date: 'campaigns.end_date',
+                    raised_amount: 'crowdfundings.raised_amount',
+                    status: 'campaigns.status',
+                })
+                .first();
+
+            if (!updatedVaquinha) {
+                throw new AppError('Vaquinha não encontrada', 404);
+            }
+
+            return updatedVaquinha;
         });
     }
 }
